@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upward · Personal Execution Database</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand-area">
+          <a class="brand-logo" href="#overview" data-nav="overview">
+            <span class="brand-icon">↑</span>
+            <span>UPWARD<br /><small style="font-size:0.65rem; color:#a3e635; letter-spacing:0.08em;">EXECUTION DB</small></span>
+          </a>
+        </div>
+
+        <div class="sidebar-section-title">Core Execution</div>
+        <div class="nav-group">
+          <a class="nav-item active" data-nav="overview"><span>Overview</span></a>
+          <a class="nav-item" data-nav="today"><span>Today</span> <span class="badge" id="sideTodayBadge">0</span></a>
+          <a class="nav-item" data-nav="tasks"><span>Tasks</span> <span class="badge" id="sideTaskBadge">0</span></a>
+          <a class="nav-item" data-nav="daily"><span>Daily Log & Journal</span></a>
+          <a class="nav-item" data-nav="history"><span>History</span></a>
+          <a class="nav-item" data-nav="calendar"><span>Calendar</span></a>
+        </div>
+
+        <div class="sidebar-section-title">Technical Domains</div>
+        <div class="nav-group">
+          <a class="nav-item" data-nav="dsa"><span>DSA Tracker</span> <span class="badge" id="sideDsaBadge">0</span></a>
+          <a class="nav-item" data-nav="implab"><span>Implementation Lab</span></a>
+          <a class="nav-item" data-nav="csfundamentals"><span>CS Fundamentals</span></a>
+          <a class="nav-item" data-nav="ml"><span>Machine Learning</span></a>
+          <a class="nav-item" data-nav="dl"><span>Deep Learning</span></a>
+          <a class="nav-item" data-nav="genai"><span>GenAI / RAG</span></a>
+          <a class="nav-item" data-nav="engineering"><span>Backend & DevOps</span></a>
+        </div>
+
+        <div class="sidebar-section-title">Work & Growth</div>
+        <div class="nav-group">
+          <a class="nav-item" data-nav="projects"><span>Projects</span></a>
+          <a class="nav-item" data-nav="oss"><span>Open Source</span></a>
+          <a class="nav-item" data-nav="communication"><span>Communication</span></a>
+          <a class="nav-item" data-nav="reading"><span>Reading</span></a>
+          <a class="nav-item" data-nav="contests"><span>Contests & Hackathons</span></a>
+          <a class="nav-item" data-nav="career"><span>Career Pipeline</span></a>
+          <a class="nav-item" data-nav="college"><span>College</span></a>
+          <a class="nav-item" data-nav="scoreboard"><span>Goals & Scoreboard</span></a>
+        </div>
+
+        <div class="sidebar-section-title" style="margin-top:auto;">System</div>
+        <div class="nav-group">
+          <a class="nav-item" data-nav="settings"><span>Backup & Data</span></a>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTAINER -->
+      <main>
+        <!-- TOPBAR -->
+        <header class="global-topbar">
+          <div class="topbar-left">
+            <p class="eyebrow" id="liveDateLabel">TODAY</p>
+            <h1 id="viewTitle">Overview</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-secondary btn-sm" id="globalSearchBtn">
+              🔍 Search <span class="mono" style="font-size:0.75rem; color:var(--text-muted);">(Ctrl+K)</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" data-modal="task">
+              + Task
+            </button>
+            <button class="btn btn-secondary btn-sm" data-modal="dsa">
+              + DSA Problem
+            </button>
+            <button class="btn btn-primary btn-sm" data-modal="activity">
+              + Log Activity
+            </button>
+          </div>
+        </header>
+
+        <!-- VIEW: OVERVIEW -->
+        <div class="view-container active" id="view-overview">
+          <div class="grid-4" id="overviewStatsGrid">
+            <div class="card metric-card">
+              <span class="eyebrow">TASKS COMPLETED</span>
+              <div class="val" id="statTasksCount">0</div>
+              <span class="target">Total logged tasks</span>
+            </div>
+            <div class="card metric-card">
+              <span class="eyebrow">DSA PROBLEMS SOLVED</span>
+              <div class="val" id="statDsaCount">0</div>
+              <span class="target" id="statDsaIndependent">0 independent</span>
+            </div>
+            <div class="card metric-card">
+              <span class="eyebrow">ACTIVITIES LOGGED</span>
+              <div class="val" id="statEventsCount">0</div>
+              <span class="target">Execution entries</span>
+            </div>
+            <div class="card metric-card">
+              <span class="eyebrow">ACTIVE STREAK</span>
+              <div class="val" id="statStreakDays">0 days</div>
+              <span class="target">Daily consistency</span>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">TODAY'S WORK</p>
+                  <h2>Planned & Logged Today</h2>
+                </div>
+                <button class="btn btn-secondary btn-sm" data-nav="today">Open Today View →</button>
+              </div>
+              <div id="overviewTodayList" style="display:grid; gap:8px;"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">RECENT HISTORY</p>
+                  <h2>Recent Logged Work</h2>
+                </div>
+                <button class="btn btn-secondary btn-sm" data-nav="history">Full History →</button>
+              </div>
+              <div id="overviewRecentEvents" style="display:grid; gap:8px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: TODAY -->
+        <div class="view-container" id="view-today">
+          <div class="card" style="background:#f0f7f3; border-color:#c4e2cf;">
+            <div class="card-header" style="margin-bottom:0;">
+              <div>
+                <p class="eyebrow">TODAY'S EXECUTION</p>
+                <h2 id="todayDateHeading">August 21, 2026</h2>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-primary btn-sm" data-modal="task">+ Add Task</button>
+                <button class="btn btn-secondary btn-sm" data-modal="dsa">+ Log DSA</button>
+                <button class="btn btn-secondary btn-sm" data-modal="activity">+ Log Activity</button>
+                <button class="btn btn-secondary btn-sm" data-modal="journal">+ Journal Entry</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Planned Tasks -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">INTENTIONS</p>
+                  <h3>Today's Planned Tasks</h3>
+                </div>
+                <span class="status-pill pill-neutral" id="todayPlannedCount">0</span>
+              </div>
+              <div id="todayPlannedTasks" style="display:grid; gap:8px;"></div>
+            </div>
+
+            <!-- Completed Tasks -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">COMPLETED</p>
+                  <h3>Completed Today</h3>
+                </div>
+                <span class="status-pill pill-green" id="todayCompletedCount">0</span>
+              </div>
+              <div id="todayCompletedTasks" style="display:grid; gap:8px;"></div>
+            </div>
+          </div>
+
+          <!-- Logged Activities & Deadlines -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">ACTIVITY TRAIL</p>
+                  <h3>Activities Logged Today</h3>
+                </div>
+              </div>
+              <div id="todayActivityList" style="display:grid; gap:8px;"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">UPCOMING DEADLINES</p>
+                  <h3>Next 14 Days</h3>
+                </div>
+              </div>
+              <div id="todayUpcomingDeadlines" style="display:grid; gap:8px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: TASKS -->
+        <div class="view-container" id="view-tasks">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">TASK MANAGER</p>
+              <h2>Tasks & Intentions</h2>
+            </div>
+            <button class="btn btn-primary" data-modal="task">+ Create Task</button>
+          </div>
+
+          <div class="filter-bar">
+            <button class="btn btn-sm btn-primary task-filter-btn active" data-filter="ALL">All Tasks</button>
+            <button class="btn btn-sm btn-secondary task-filter-btn" data-filter="PLANNED">Planned</button>
+            <button class="btn btn-sm btn-secondary task-filter-btn" data-filter="TODAY">Scheduled Today</button>
+            <button class="btn btn-sm btn-secondary task-filter-btn" data-filter="COMPLETED">Completed</button>
+            <select id="taskCategorySelect" style="width:auto; padding:4px 8px; font-size:0.8rem;">
+              <option value="ALL">All Categories</option>
+              <option value="DSA">DSA</option>
+              <option value="ML">ML</option>
+              <option value="AI / GenAI">AI / GenAI</option>
+              <option value="Backend / Software Engineering">Backend / SWE</option>
+              <option value="CS Fundamentals">CS Fundamentals</option>
+              <option value="Open Source">Open Source</option>
+              <option value="Projects">Projects</option>
+              <option value="Communication">Communication</option>
+              <option value="Reading">Reading</option>
+              <option value="Career">Career</option>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Contest">Contest</option>
+              <option value="College">College</option>
+              <option value="Personal">Personal</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div id="tasksListContainer" style="display:grid; gap:10px;"></div>
+        </div>
+
+        <!-- VIEW: DAILY LOG & JOURNAL -->
+        <div class="view-container" id="view-daily">
+          <div class="grid-2">
+            <!-- Log Activity Form -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">LOG WORK</p>
+                  <h2>Record Activity</h2>
+                </div>
+              </div>
+              <form id="activityLogForm" style="display:grid; gap:14px;">
+                <div class="form-grid-2">
+                  <label>Date<input type="date" name="date" required id="activityDateInput" /></label>
+                  <label>Category
+                    <select name="category" required>
+                      <option value="DSA">DSA</option>
+                      <option value="ML">ML</option>
+                      <option value="AI / GenAI">AI / GenAI</option>
+                      <option value="Backend / Software Engineering">Backend / SWE</option>
+                      <option value="CS Fundamentals">CS Fundamentals</option>
+                      <option value="Open Source">Open Source</option>
+                      <option value="Projects">Projects</option>
+                      <option value="Communication">Communication</option>
+                      <option value="Reading">Reading</option>
+                      <option value="Career">Career</option>
+                      <option value="Hackathon">Hackathon</option>
+                      <option value="Contest">Contest</option>
+                      <option value="College">College</option>
+                      <option value="Personal">Personal</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </label>
+                </div>
+                <label>What I worked on<input type="text" name="title" required placeholder="e.g. Implemented hybrid retrieval in FastAPI" /></label>
+                <div class="form-grid-2">
+                  <label>Duration (Minutes)<input type="number" min="0" name="duration" placeholder="e.g. 45" /></label>
+                  <label>Related Project / Topic<input type="text" name="related" placeholder="e.g. Enterprise Assistant" /></label>
+                </div>
+                <label>Output / Result<input type="text" name="output" placeholder="e.g. 5 endpoints tested and verified" /></label>
+                <label>Proof Link / URL (Optional)<input type="url" name="proofUrl" placeholder="https://github.com/..." /></label>
+                <label>Notes / Insights<textarea name="notes" placeholder="Notes or insights from this session"></textarea></label>
+                <button class="btn btn-primary" type="submit">Save Activity Entry</button>
+              </form>
+            </div>
+
+            <!-- Daily Journal Form -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <p class="eyebrow">DAILY JOURNAL</p>
+                  <h2>Daily Reflection</h2>
+                </div>
+              </div>
+              <form id="journalForm" style="display:grid; gap:14px;">
+                <label>Date<input type="date" name="date" required id="journalDateInput" /></label>
+                <label>What went well?<textarea name="well" placeholder="What moved the needle today?"></textarea></label>
+                <label>What went badly / what distracted you?<textarea name="badly" placeholder="Where did time or focus get lost?"></textarea></label>
+                <label>What did you learn / key takeaway?<textarea name="learned" placeholder="Core lesson or insight to remember"></textarea></label>
+                <label>Free-form Notes<textarea name="notes" placeholder="Any thoughts, ideas, or reminders"></textarea></label>
+                <button class="btn btn-primary" type="submit">Save Journal Entry</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: DSA TRACKER -->
+        <div class="view-container" id="view-dsa">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">DSA PROBLEM LOG</p>
+              <h2>Data Structures & Algorithms</h2>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-secondary btn-sm" id="btnImportDsaJson">📥 Import CSV / JSON</button>
+              <input type="file" id="dsaImportFile" accept=".json,.csv" style="display:none;" />
+              <button class="btn btn-primary btn-sm" data-modal="dsa">+ Log Problem</button>
+            </div>
+          </div>
+
+          <div class="grid-4" id="dsaSummaryStats"></div>
+
+          <!-- Problem Table -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Solved Problems Log</h3>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <select id="dsaTopicFilter">
+                  <option value="ALL">All Topics</option>
+                </select>
+                <select id="dsaDifficultyFilter">
+                  <option value="ALL">All Difficulties</option>
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+                <select id="dsaPlatformFilter">
+                  <option value="ALL">All Platforms</option>
+                  <option value="LeetCode">LeetCode</option>
+                  <option value="Codeforces">Codeforces</option>
+                  <option value="CodeChef">CodeChef</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Problem Name</th>
+                    <th>Platform</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Independent?</th>
+                    <th>Notes / Insight</th>
+                    <th>Proof Link</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dsaTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: IMPLEMENTATION LAB -->
+        <div class="view-container" id="view-implab">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">IMPLEMENTATION LAB</p>
+              <h2>Algorithms Implemented From Scratch (DSA & ML)</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="addAlgo">+ Add Custom Algorithm</button>
+          </div>
+
+          <div class="filter-bar">
+            <button class="btn btn-sm btn-primary implab-filter-btn active" data-domain="ALL">All Domains</button>
+            <button class="btn btn-sm btn-secondary implab-filter-btn" data-domain="DSA">DSA / CS</button>
+            <button class="btn btn-sm btn-secondary implab-filter-btn" data-domain="ML">Machine Learning</button>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Algorithm</th>
+                    <th>Domain</th>
+                    <th>Understood</th>
+                    <th>Implemented</th>
+                    <th>Tested</th>
+                    <th>Used</th>
+                    <th>Explained</th>
+                    <th>GitHub / Proof</th>
+                    <th>Notes</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="implabTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: CS FUNDAMENTALS -->
+        <div class="view-container" id="view-csfundamentals">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">CS INTERVIEW CHECKLIST</p>
+              <h2>CS Core Fundamentals & System Design</h2>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-modal="addCsTopic">+ Add Topic</button>
+          </div>
+          <div class="grid-2" id="csChecklistsGrid"></div>
+        </div>
+
+        <!-- VIEW: MACHINE LEARNING -->
+        <div class="view-container" id="view-ml">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">MACHINE LEARNING CURRICULUM</p>
+              <h2>Classical ML, Python/Data & Statistics Checklist</h2>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-modal="addMlTopic">+ Add ML Topic</button>
+          </div>
+          <div class="grid-2" id="mlChecklistsGrid"></div>
+        </div>
+
+        <!-- VIEW: DEEP LEARNING -->
+        <div class="view-container" id="view-dl">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">DEEP LEARNING CHECKLIST</p>
+              <h2>Neural Networks, PyTorch, CNNs & Transformers</h2>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-modal="addDlTopic">+ Add DL Topic</button>
+          </div>
+          <div class="grid-2" id="dlChecklistsGrid"></div>
+        </div>
+
+        <!-- VIEW: GENAI / RAG -->
+        <div class="view-container" id="view-genai">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">GENAI & RAG CHECKLIST</p>
+              <h2>LLMs, RAG Architecture, Evaluation & Frameworks</h2>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-modal="addGenAiTopic">+ Add GenAI Topic</button>
+          </div>
+          <div class="grid-2" id="genAiChecklistsGrid"></div>
+        </div>
+
+        <!-- VIEW: ENGINEERING / BACKEND -->
+        <div class="view-container" id="view-engineering">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">SOFTWARE ENGINEERING CHECKLIST</p>
+              <h2>Python, Git, FastAPI, Databases & DevOps</h2>
+            </div>
+            <button class="btn btn-secondary btn-sm" data-modal="addEngTopic">+ Add Backend Topic</button>
+          </div>
+          <div class="grid-2" id="engineeringChecklistsGrid"></div>
+        </div>
+
+        <!-- VIEW: PROJECTS -->
+        <div class="view-container" id="view-projects">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">PROJECT WORKSPACE</p>
+              <h2>Software & AI Projects</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="project">+ New Project</button>
+          </div>
+
+          <div id="projectsListContainer" style="display:grid; gap:16px;"></div>
+        </div>
+
+        <!-- VIEW: OPEN SOURCE -->
+        <div class="view-container" id="view-oss">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">OPEN SOURCE LOG</p>
+              <h2>Contributions & Pull Requests</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="oss">+ Log Contribution</button>
+          </div>
+          <div class="grid-3" id="ossStatsGrid"></div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Date</th><th>Repository</th><th>Type</th><th>Description</th><th>Status</th><th>PR Link</th><th>Review Learnings</th><th>Action</th></tr>
+                </thead>
+                <tbody id="ossTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: COMMUNICATION -->
+        <div class="view-container" id="view-communication">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">COMMUNICATION LAB</p>
+              <h2>Speaking Sessions & Defense Log</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="communication">+ Log Session</button>
+          </div>
+          <div class="grid-3" id="commStatsGrid"></div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Recorded Sessions</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Date</th><th>Topic</th><th>Category</th><th>Duration (min)</th><th>Self-Rating</th><th>Proof / Recording Link</th><th>Notes</th><th>Action</th></tr>
+                </thead>
+                <tbody id="commTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: READING -->
+        <div class="view-container" id="view-reading">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">READING TRACKER</p>
+              <h2>Books, Papers & Documentation</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="reading">+ Log Reading</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Date</th><th>Book / Resource</th><th>Category</th><th>Pages / Minutes</th><th>Status</th><th>Key Insight & Notes</th><th>Link</th><th>Action</th></tr>
+                </thead>
+                <tbody id="readingTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: CONTESTS & HACKATHONS -->
+        <div class="view-container" id="view-contests">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">COMPETITIVE LOG</p>
+              <h2>Contests & Hackathons</h2>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-secondary btn-sm" data-modal="contest">+ Add Contest</button>
+              <button class="btn btn-primary btn-sm" data-modal="hackathon">+ Add Hackathon</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><h3>Contest Records</h3></div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>Date</th><th>Platform & Name</th><th>Solved / Att.</th><th>Result</th><th>Notes & Mistakes</th><th>Action</th></tr>
+                  </thead>
+                  <tbody id="contestTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3>Hackathons</h3></div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>Name</th><th>Status</th><th>Deadline</th><th>Tech Stack & Idea</th><th>Links</th><th>Action</th></tr>
+                  </thead>
+                  <tbody id="hackathonTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: CAREER -->
+        <div class="view-container" id="view-career">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">CAREER PIPELINE</p>
+              <h2>Job & Internship Applications</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="application">+ Add Application</button>
+          </div>
+          <div class="grid-4" id="careerStatsGrid"></div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Company & Role</th><th>Date Applied</th><th>Stage</th><th>Resume Ver</th><th>Referral</th><th>Notes & Feedback</th><th>Action</th></tr>
+                </thead>
+                <tbody id="careerTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: COLLEGE -->
+        <div class="view-container" id="view-college">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">COLLEGE WORK</p>
+              <h2>Academics, Courses & Assignments</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="college">+ Add Academic Item</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Course</th><th>Type</th><th>Title & Description</th><th>Deadline / Date</th><th>Status</th><th>Notes & Link</th><th>Action</th></tr>
+                </thead>
+                <tbody id="collegeTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: GOALS & SCOREBOARD -->
+        <div class="view-container" id="view-scoreboard">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">OBJECTIVE NUMBERS</p>
+              <h2>Scoreboard & Goals</h2>
+            </div>
+            <button class="btn btn-primary btn-sm" data-modal="goal">+ Add Goal</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Active Goals</h3></div>
+            <div class="grid-3" id="goalsCardsGrid"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Execution Scoreboard (Derived Totals)</h3></div>
+            <div class="grid-4" id="scoreboardNumbersGrid"></div>
+          </div>
+        </div>
+
+        <!-- VIEW: HISTORY -->
+        <div class="view-container" id="view-history">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">HISTORICAL WORK INVENTORY</p>
+              <h2>Comprehensive Activity History</h2>
+            </div>
+          </div>
+
+          <!-- Time Range Filter -->
+          <div class="filter-bar">
+            <button class="btn btn-sm btn-primary history-time-btn active" data-time="ALL">All Time</button>
+            <button class="btn btn-sm btn-secondary history-time-btn" data-time="TODAY">Today</button>
+            <button class="btn btn-sm btn-secondary history-time-btn" data-time="YESTERDAY">Yesterday</button>
+            <button class="btn btn-sm btn-secondary history-time-btn" data-time="WEEK">This Week</button>
+            <button class="btn btn-sm btn-secondary history-time-btn" data-time="MONTH">This Month</button>
+            <button class="btn btn-sm btn-secondary history-time-btn" data-time="YEAR">This Year</button>
+            <select id="historyCategorySelect" style="width:auto; padding:4px 8px; font-size:0.8rem;">
+              <option value="ALL">All Categories</option>
+              <option value="DSA">DSA</option>
+              <option value="ML">ML</option>
+              <option value="AI / GenAI">AI / GenAI</option>
+              <option value="Backend / Software Engineering">Backend / SWE</option>
+              <option value="CS Fundamentals">CS Fundamentals</option>
+              <option value="Open Source">Open Source</option>
+              <option value="Projects">Projects</option>
+              <option value="Communication">Communication</option>
+              <option value="Reading">Reading</option>
+              <option value="Career">Career</option>
+              <option value="Hackathon">Hackathon</option>
+              <option value="Contest">Contest</option>
+              <option value="College">College</option>
+              <option value="Personal">Personal</option>
+              <option value="Journal">Journal</option>
+              <option value="Other">Other</option>
+            </select>
+            <input type="text" id="historySearchInput" placeholder="Filter text..." style="width:200px; padding:4px 8px; font-size:0.8rem;" />
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Activity / Output</th>
+                    <th>Duration</th>
+                    <th>Proof / Link</th>
+                    <th>Notes</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: CALENDAR -->
+        <div class="view-container" id="view-calendar">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">CALENDAR VIEW</p>
+              <h2>Monthly Execution Activity</h2>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn btn-secondary btn-sm" id="calPrevMonthBtn">← Prev</button>
+              <span class="mono" id="calCurrentMonthLabel" style="font-weight:700; font-size:1rem; padding:0 8px;">August 2026</span>
+              <button class="btn btn-secondary btn-sm" id="calNextMonthBtn">Next →</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="calendar-grid" id="calendarGridContainer"></div>
+          </div>
+        </div>
+
+        <!-- VIEW: BACKUP & SETTINGS -->
+        <div class="view-container" id="view-settings">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">DATA MANAGEMENT</p>
+              <h2>Backup, Export & Health</h2>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>JSON Backup & Restore</h3>
+              <p class="muted" style="margin:8px 0 16px; font-size:0.85rem;">
+                Export your full execution database to a local JSON file. All tasks, problem logs, checklists, projects, and journal entries are preserved.
+              </p>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-primary" id="btnExportFullJson">📦 Export Full JSON Backup</button>
+                <label class="btn btn-secondary" style="cursor:pointer; margin:0;">
+                  📥 Restore JSON Backup
+                  <input type="file" id="importFullJsonInput" accept=".json" style="display:none;" />
+                </label>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>CSV Data Exports</h3>
+              <p class="muted" style="margin:8px 0 16px; font-size:0.85rem;">
+                Export specific subsets of your work to CSV for spreadsheets or external analysis.
+              </p>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-secondary" id="btnExportDsaCsv">📄 Export DSA CSV</button>
+                <button class="btn btn-secondary" id="btnExportActivitiesCsv">📄 Export Activities CSV</button>
+                <button class="btn btn-secondary" id="btnExportTasksCsv">📄 Export Tasks CSV</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="card" style="margin-top:24px; border:1px solid #ef4444; background:rgba(239,68,68,0.04);">
+            <h3 style="color:#ef4444;">⚠ Danger Zone</h3>
+            <p class="muted" style="margin:8px 0 16px; font-size:0.85rem;">
+              Permanently delete all your data and reset the app to a clean slate. This action <strong>cannot be undone</strong>. Export a JSON backup first if you want to save anything.
+            </p>
+            <button class="btn" id="btnFactoryReset" style="background:#ef4444; color:#fff; border:none;">🗑 Clear All Data &amp; Reset</button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- UNIVERSAL ENTRY MODAL -->
+    <dialog id="entryModal">
+      <form method="dialog" id="modalForm" class="modal-inner">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add Entry</h2>
+          <button class="modal-close" value="cancel" type="button">×</button>
+        </div>
+        <div id="modalFields" style="display:grid; gap:12px;"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" value="cancel" type="button" id="modalCancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="modalSaveBtn" value="default" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- DAY DETAILS MODAL (CALENDAR & INSPECTOR) -->
+    <dialog id="dayDetailsModal">
+      <div class="modal-inner">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">DAY RECORD</p>
+            <h2 id="dayModalDateTitle">August 21, 2026</h2>
+          </div>
+          <button class="modal-close" id="dayModalCloseBtn" type="button">×</button>
+        </div>
+        <div id="dayModalContent" style="display:grid; gap:12px; max-height:450px; overflow-y:auto;"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" id="dayModalDismiss">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- GLOBAL SEARCH (Ctrl+K) -->
+    <dialog id="searchDialog">
+      <div style="padding:0;">
+        <input type="text" class="search-box-input" id="globalSearchInput" placeholder="Search tasks, DSA problems, projects, notes, checklist items... (ESC to close)" style="width:100%; border:0; border-bottom:1px solid var(--border); padding:14px 18px; font-size:1rem; font-family:var(--font-main);" />
+        <div class="search-results-list" id="searchResultsList" style="max-height:350px; overflow-y:auto; padding:8px; display:grid; gap:4px;"></div>
+      </div>
+    </dialog>
+
+    <!-- TOAST BAR -->
+    <div class="toast-bar" id="toastBar">
+      <span id="toastMessage">Action completed</span>
+      <button class="btn btn-sm btn-accent" id="toastUndoBtn" style="display:none;">Undo</button>
+    </div>
+
+    <script src="engine.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
